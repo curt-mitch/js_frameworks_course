@@ -1,0 +1,100 @@
+<!-- JSFiddle: https://jsfiddle.net/smax/b35rc69m/ -->
+
+<script src="https://unpkg.com/react@15/dist/react.js"></script>
+<script src="https://unpkg.com/react-dom@15/dist/react-dom.js"></script>
+
+<div id="app"></div>
+
+<!--
+  1) Create a <div> and render a base component with React
+  2) Output an array of hobbies in this <div> (provide some default hobbies)
+  3) Add a 'New Hobby' button + <input> field where you add the hobby the user entered to the list
+  4) Make the hobbies clickable to remove them once clicked
+  5) Add a <p>Hobby deleted!</p> which is only shown once at least one hobby was deleted (be creative on how to track this!)
+  6) Add a hobby counter (<p>Hobbies: ...</p>) above the list of hobbies
+  7) Dynamically style/ add classes to the hobby counter, depending on whether you have more or less than 3 hobbies
+  8) Outsource your hobbies (the <li> elements) into a re-usable component
+-->
+
+<script type="text/javascript">
+
+const HobbyLi = (props) => {
+ return (
+  <li
+    onClick={props.removeHobby}
+  >{props.hobbyName}</li>
+ );
+}
+
+class App extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      hobbies: ['reading', 'running', 'video games'],
+      hobbyDeleted: 'hide',
+      newHobbyName: '',
+    };
+  }
+
+  removeHobby(indexVal) {
+    const hobbies = this.state.hobbies;
+    const hobbyDeleted = 'show';
+    hobbies.splice(indexVal, 1);
+    this.setState({
+      hobbies,
+      hobbyDeleted,
+    });
+  }
+
+  updateNewHobbyName(event) {
+    const updatedName = event.target.value;
+    this.setState({
+      newHobbyName: updatedName,
+    });
+  }
+
+  addNewHobby() {
+    const hobbyList = this.state.hobbies;
+    hobbyList.push(this.state.newHobbyName);
+    this.setState({
+      hobbies: hobbyList,
+    });
+  }
+
+  render() {
+    const manyHobbies = this.state.hobbies.length > 3;
+    const hobbyDeletedStyle = {
+      'display': this.state.hobbyDeleted === 'show' ? 'block' : 'none'
+    };
+    const listItems = this.state.hobbies.map((d, i) => {
+      const removeHobby = this.removeHobby.bind(this, i);
+      return <HobbyLi
+        hobbyName={d}
+        key={i}
+        removeHobby={removeHobby}
+        />;
+    });
+
+
+    return (
+      <div>
+        <div
+          style={hobbyDeletedStyle}
+        >Hobby Deleted!</div>
+        <input type="text"
+          value={this.state.newHobbyName}
+          onChange={this.updateNewHobbyName.bind(this)} />
+        <button onClick={this.addNewHobby.bind(this)}>New Hobby</button>
+        <div style={ manyHobbies ? { backgroundColor: 'yellow'} : {} }>Hobby Counter: {this.state.hobbies.length}</div>
+        <ul>
+          {listItems}
+        </ul>
+      </div>
+    );
+  }
+
+}
+
+ReactDOM.render(<App />, document.querySelector('#app'));
+</script>
